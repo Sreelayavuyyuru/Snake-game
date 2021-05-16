@@ -40,4 +40,4 @@ function gameloop() {
 
 init();
 
-var f = setInterval(gameloop, 1000);
+var f = setInterval(gameloop, 100);
