@@ -4,6 +4,8 @@ function init() {
     H = canvas.height = 720;
     pen=canvas.getContext('2d');
     cs=60;
+    food = getRandomFood();
+    game_over = false;
 
     snake = {
         init_len:5,
@@ -22,14 +24,19 @@ function init() {
                 pen.fillRect(this.cells[i].x*cs,this.cells[i].y*cs, cs-1, cs-1);
             }
         },
-        //New update function for complete movement
+        //New update function for complete movement of the snake
         updateSnake:function(){
             // console.log("updateSnake");
             // console.log(this.direction);
-
-            this.cells.pop();
             var headX = this.cells[0].x;
             var headY = this.cells[0].y;
+            
+            if(headX == food.x && headY == food.y){
+                console.log("Eaten");
+                food=getRandomFood();
+            } else {
+                this.cells.pop();
+            }
             // console.log(headX + " " + headY);
             var nextX, nextY;
             if(this.direction=="right"){
@@ -52,11 +59,11 @@ function init() {
             var last_y=Math.round(H/cs);
 
             if(this.cells[0].x < -1 || this.cells[0].y < -1 || this.cells[0].x > last_x || this.cells[0].y > last_y){
-                window.alert("Sorry the game is over!");
+                game_over=true;
             }
         }
 
-        // previous udate fucntion for snake movement to right
+        // previous update fucntion for snake movement ( only to the right side )
         // updateSnake:function(){
         //     console.log("updateSnake");
             // this.cells.pop();
@@ -83,8 +90,10 @@ function init() {
             snake.direction="down";
         } else if(e.key=="ArrowUp"){
             snake.direction="up";
+        } else if(e.key=="Enter"){
+            location.reload();
         }
-        // console.log(snake.direction);
+        console.log(snake.direction);
     }
     // Adding an event listener on the document object
     document.addEventListener('keydown', keyPressed);
@@ -93,17 +102,36 @@ function init() {
 function draw() {
     pen.clearRect(0, 0, W, H);
     snake.drawSnake();
+    pen.fillRect(food.x*cs, food.y*cs, cs, cs);
 }
 
 function update() {
     snake.updateSnake();
 }
 
+function getRandomFood(){
+    var foodX = Math.round(Math.random()*((W-cs)/cs));
+    var foodY = Math.round(Math.random()*((H-cs)/cs));
+
+    var food = {
+        x: foodX,
+        y: foodY,
+        color: "black",
+    }
+    return food;
+}
+
 function gameloop() {
+    if(game_over == true){
+        clearInterval(f);
+        alert("GAME OVER!!")
+        alert("Press Command+R to reload the game!");
+        return;
+    }
     draw();
     update();
 }
 
 init();
 
-var f = setInterval(gameloop, 100);
+var f = setInterval(gameloop, 200);
